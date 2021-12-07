@@ -1,9 +1,8 @@
 library(gmp)
+DAYS = 256
 
 # read the fish ages
-fish = scan("example_input", integer(), sep=",")
-
-DAYS = 256
+fish = scan("input", integer(), sep=",")
 
 # count fish in each age group
 for(t in 1:9){
@@ -11,6 +10,7 @@ for(t in 1:9){
 }
 # Use big integers to avoid overflow
 fish_by_age = as.bigz(fish_by_age)
+
 
 # Run for given number of days
 for(d in 1:DAYS){
