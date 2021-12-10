@@ -2,9 +2,10 @@
 data = readLines("input")
 
 # Define system data
-starters = c("(","[","{","<")
-closers = c(")","]","}",">")
-corruption_scores = c(3, 57, 1197, 25137)
+starters = c( ")" = "(" ,  "]" = "[", "}" = "{",  ">" = "<")
+closers = c( "(" = ")" ,  "[" = "]", "{" = "}",  "<" = ">")
+corruption_scores = c(")" = 3, "]" = 57, "}" = 1197,  ">" = 25137)
+completion_scores = c("(" = 1, "[" = 2, "{" = 3,  "<" = 4)
 
 # Zero start values for both exercises
 corruption_score = 0
@@ -31,10 +32,9 @@ for(string_line in data){
       started = head(started, -1)
 
       # Check for bad matches
-      index = which(closers==c)
-      if(starter != starters[index]){
+      if(starter != starters[c]){
         # Fount a mismatch. Calculate score
-        corruption_score = corruption_score + corruption_scores[index]
+        corruption_score = corruption_score + corruption_scores[c]
         corrupt = TRUE
         break
       }
@@ -47,7 +47,7 @@ for(string_line in data){
     score = 0
     for(c in started[length(started):1]){
       score = score * 5
-      score = score + which(starters==c)
+      score = score + completion_scores[c]
     }
     completed_line_scores = c(completed_line_scores, score)
   }
