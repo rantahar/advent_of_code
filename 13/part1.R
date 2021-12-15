@@ -74,7 +74,7 @@ for(fold in folds){
 }
 
 paper[!paper] = "."
-paper[paper=="TRUE"] = "x"
+paper[paper=="TRUE"] = "0"
 
 print(paper)
 
