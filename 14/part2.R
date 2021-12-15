@@ -6,6 +6,9 @@ data = readLines("input")
 # The polymer template is on the first line
 polymer = data[1]
 
+first_letter = polymer[1]
+last_letter = polymer[length(polymer)]
+
 cat("template", polymer, "\n")
 
 # make a list of pairs and number them. Each produce 2 new pairs each round
@@ -54,6 +57,7 @@ for( line in data[3:length(data)]){
 
 print(pairs["HH"])
 
+# Each time step apply the rules on each pair
 for(i in 1:40){
   new_pairs = integer64()
   for(pair in names(pairs)){
@@ -74,12 +78,16 @@ for(i in 1:40){
   print(pairs["HK"])
 }
 
+# Now count both letters in each pair
 counts = integer64()
 for(c in chars){
   counts[c] = 0
 }
-counts["N"] = 1
-counts["F"] = 1
+
+# This will count each letter twice, except for the first and the last.
+# Easiest way to correct is to add 1 here (for some reason ceiling fails)
+counts[first_letter] = 1
+counts[last_letter] = 1
 
 for(pair in names(pairs)){
   c1 = substr(pair, 1, 1)
