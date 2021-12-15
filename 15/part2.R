@@ -32,10 +32,10 @@ cols = 5*cols
 # First, initialize to a large number
 costs = matrix(100000, rows, cols)
 
-# cost at cornet starts at 0
+# cost at corner starts at 0
 costs[1,1] = 0
 
-for(step in 1:(rows*rows)){
+while(TRUE){
   costs_before = costs
   d = dim(danger)
   
@@ -70,6 +70,5 @@ for(step in 1:(rows*rows)){
     print(costs[rows,cols])
     break
   }
-  
 }
 
