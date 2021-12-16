@@ -17,39 +17,42 @@ for(r in 1:rows){
 # First, initialize to a large number
 costs = matrix(1000, rows, cols)
 
-# cost at cornet starts at 0
-costs[1,1] = 0
+# cost at corner starts at 0
+costs[1] = 0
+changed = c(1)
 
-for(step in 1:(10*rows)){
-  costs_before = costs
-  d = dim(danger)
-  
-  # y down
-  move_cost = costs[1:(d[1]-1), 1:d[2]] + danger[2:d[1], 1:d[2]]
-  updates = costs[2:d[1], 1:d[2]] > move_cost
-  costs[2:d[1], 1:d[2]][updates] = move_cost[updates]
-  
-  # y up
-  move_cost = costs[2:d[1], 1:d[2]] + danger[1:(d[1]-1), 1:d[2]]
-  updates = costs[1:(d[1]-1), 1:d[2]] > move_cost
-  costs[1:(d[1]-1), 1:d[2]][updates] = move_cost[updates]
-  
-  # x down
-  move_cost = costs[1:d[1], 1:(d[2]-1)] + danger[1:d[1], 2:d[2]]
-  updates = costs[1:d[1], 2:d[2]] > move_cost
-  costs[1:d[1], 2:d[2]][updates] = move_cost[updates]
-  
-  # x up
-  move_cost = costs[1:d[1], 2:d[2]] + danger[1:d[1], 1:(d[2]-1)]
-  updates = costs[1:d[1], 1:(d[2]-1)] > move_cost
-  costs[1:d[1], 1:(d[2]-1)][updates] = move_cost[updates]
-  
-  diff = costs_before - costs
-  if(sum(diff!=0)==0){
-    print("done")
-    print(costs[rows,cols])
-    break
+step = 1
+while(length(changed) > 0){
+  new_changed = c()
+  for(nb in list(c(1,0), c(-1,0), c(0,1), c(0,-1))){
+    y = changed %% rows
+    x = floor(changed / rows) + 1
+    
+    nby = y + nb[1]
+    nbx = x + nb[2]
+    
+    allowed = nby > 0 & nby <= rows & nbx > 0 & nbx <= cols
+    nby = nby[allowed]
+    nbx = nbx[allowed]
+    
+    nbs = nby + rows*(nbx-1)
+    origins = changed[allowed]
+    
+    if(length(nbs) > 0){
+      new_costs = danger[nbs] + costs[origins]
+      do_change = new_costs < costs[nbs]
+      new_costs = new_costs[do_change]
+      nbs = nbs[do_change]
+      costs[nbs] = new_costs
+      new_changed = c(new_changed, nbs)
+    }
   }
+  changed = unique(new_changed)
   
+  if(step%%1 == 0){
+    cat("step", step, ", num changes", length(changed), "\n")
+  }
+  step = step + 1
 }
 
+print(costs[rows, cols])

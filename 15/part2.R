@@ -11,9 +11,6 @@ danger = matrix(0, 5*rows, 5*cols)
 # the larger map
 for(r in 1:rows){
   value = strtoi(strsplit(data[r], "")[[1]])
-  print(value)
-  print(length(value))
-  print(length((x*cols+1):((x+1)*cols)))
   for(x in 0:4){
     for(y in 0:4){
       danger[y*rows + r,(x*cols+1):((x+1)*cols)] = value + x + y
@@ -26,49 +23,61 @@ danger = (danger-1) %% 9 + 1
 rows = 5*rows
 cols = 5*cols
 
+# precalculate neighbour indeces
+neighbours = list()
+allowed = list()
+
+dirs = list(c(1,0), c(-1,0), c(0,1), c(0,-1))
+for(d in 1:4){
+  nb = dirs[[d]]
+  nbs = c()
+  alloweds = c()
+  for(y in 0:(rows-1)){
+    for(x in 0:(cols-1)){
+      index = y + rows*x + 1
+      nby = y + nb[1]
+      nbx = x + nb[2]
+      is_allowed = nby >= 0 & nby < rows & nbx >= 0 & nbx < cols
+      nbs[index] = nby + rows*nbx + 1
+      alloweds[index] = is_allowed
+    }
+  }
+  neighbours[d] = list(nbs)
+  allowed[d] = list(alloweds)
+}
+
+
 # we propagate the cost to each direction from every point,
-# keeping the lowest cost after each step. These are matrix
-# operations so they are relatively fast
+# keeping the lowest cost after each step.
 # First, initialize to a large number
 costs = matrix(100000, rows, cols)
 
 # cost at corner starts at 0
-costs[1,1] = 0
+costs[1] = 0
+changed = c(1)
 
-while(TRUE){
-  costs_before = costs
-  d = dim(danger)
-  
-  # y down
-  move_cost = costs[1:(d[1]-1), 1:d[2]] + danger[2:d[1], 1:d[2]]
-  updates = costs[2:d[1], 1:d[2]] > move_cost
-  costs[2:d[1], 1:d[2]][updates] = move_cost[updates]
-  
-  # y up
-  move_cost = costs[2:d[1], 1:d[2]] + danger[1:(d[1]-1), 1:d[2]]
-  updates = costs[1:(d[1]-1), 1:d[2]] > move_cost
-  costs[1:(d[1]-1), 1:d[2]][updates] = move_cost[updates]
-  
-  # x down
-  move_cost = costs[1:d[1], 1:(d[2]-1)] + danger[1:d[1], 2:d[2]]
-  updates = costs[1:d[1], 2:d[2]] > move_cost
-  costs[1:d[1], 2:d[2]][updates] = move_cost[updates]
-  
-  # x up
-  move_cost = costs[1:d[1], 2:d[2]] + danger[1:d[1], 1:(d[2]-1)]
-  updates = costs[1:d[1], 1:(d[2]-1)] > move_cost
-  costs[1:d[1], 1:(d[2]-1)][updates] = move_cost[updates]
-  
-  diff = costs_before - costs
-  
-  if(step%%10 == 0){
-    cat("step", step, ", num changes", sum(diff!=0), "\n")
+while(length(changed) > 0){
+  new_changed = c()
+  for(d in 1:4){
+    # map back to single index and filter the origin points
+    nbs = neighbours[[d]][changed]
+    is_allowed = allowed[[d]][changed]
+    
+    nbs = nbs[is_allowed]
+    origins = changed[is_allowed]
+    
+    if(length(nbs) > 0){
+      # Update neighbour if the new cost is smaller
+      new_costs = danger[nbs] + costs[origins]
+      do_change = new_costs < costs[nbs]
+      new_costs = new_costs[do_change]
+      nbs = nbs[do_change]
+      costs[nbs] = new_costs
+      new_changed = c(new_changed, nbs)
+    }
   }
-  
-  if(sum(diff!=0)==0){
-    print("done")
-    print(costs[rows,cols])
-    break
-  }
+  changed = unique(new_changed)
 }
+
+print(costs[rows, cols])
 
