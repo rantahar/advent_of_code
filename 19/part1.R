@@ -1,5 +1,5 @@
 # read the input lines
-data = readLines("example_3d")
+data = readLines("input")
 
 # Extract scanners and the beacon positions for each
 scanners = list()
@@ -83,6 +83,8 @@ for(m1 in 1:24){
   }
 }
 
+# Horrible hack
+scanner_locations = list(c(0,0,0))
 
 compare_scanners = function(scanner1, scanner2){
   # Try all possible rotations
@@ -98,7 +100,7 @@ compare_scanners = function(scanner1, scanner2){
         point2 = rotated2[j,]
         translated = rotated2 - point2[col(rotated2)] + point1[col(rotated2)]
         matches = 0
-        for(p1 in 1:dim(scanner1)[1]){
+        for(p1 in i:dim(scanner1)[1]){
           comps = (translated == scanner1[p1,][col(translated)])
           rowcomps = rowSums(comps) == 3
           match = sum(rowcomps) > 0
@@ -106,6 +108,7 @@ compare_scanners = function(scanner1, scanner2){
             matches = matches + 1
           }
           if(matches > 11){
+            scanner_locations[length(scanner_locations)+1] <<- list(point1-point2)
             print(point1-point2)
             break
           }
@@ -136,18 +139,16 @@ for(j in 1:length(scanners)){
 
 while(length(found_scanners) < length(scanners)){
   for(j in 1:length(scanners)){
-    if(!(j %in% found_scanners)){
-      for(i in found_scanners){
-        if(i != j && !(i %in% checked[[j]])){
-          cat(i,j,"\n")
-          res = compare_scanners(scanners[[i]], scanners[[j]])
-          if(length(res)>0){
-            scanners[j] = list(res)
-            found_scanners = c(found_scanners, j)
-            cat("found", j, "next to", i, "\n")
-          }
-          checked[j] = list(c(checked[[j]], i))
+    for(i in found_scanners){
+      if(!(j %in% found_scanners) && i != j && !(i %in% checked[[j]])){
+        cat(i,j,"\n")
+        res = compare_scanners(scanners[[i]], scanners[[j]])
+        if(length(res)>0){
+          scanners[j] = list(res)
+          found_scanners = c(found_scanners, j)
+          cat("found", j, "next to", i, "\n")
         }
+        checked[j] = list(c(checked[[j]], i))
       }
     }
   }
@@ -163,4 +164,19 @@ for(scanner in scanners){
 points = unique(points)
 
 cat("There are", dim(points)[1], "points\n")
+
+# PART II
+
+max_distance = 0
+for(i in 1:length(scanner_locations)){
+  for(j in 1:length(scanner_locations)){
+    distance = scanner_locations[[i]] - scanner_locations[[j]]
+    distance = sum(abs(distance))
+    if(distance > max_distance){
+      max_distance = distance
+    }
+  }
+}
+
+print(max_distance)
 
