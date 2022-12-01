@@ -73,8 +73,14 @@ while(length(consider) > 0){
       if(new_cost < costs[neighbour]){
         costs[neighbour] = new_cost
       }
+      if(neighbour == rows*cols){
+        break
+      }
       consider = c(neighbour, consider)
     }
+  }
+  if(neighbour == rows*cols){
+    break
   }
   visited[index] = TRUE
   
@@ -82,6 +88,5 @@ while(length(consider) > 0){
   step = step + 1
 }
 
-print(costs[1:10,1:10])
 print(costs[rows, cols])
 

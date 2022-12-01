@@ -83,5 +83,3 @@ for(i in 1:length(x_hit_steps)){
 
 cat("number of trajectories", length(pairs), "\n")
 
-
-
