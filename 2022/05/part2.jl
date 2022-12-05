@@ -1,5 +1,3 @@
-using Formatting
-
 crates = []
 
 for line in readlines("input")
