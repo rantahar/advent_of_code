@@ -11,23 +11,38 @@ for (i, line) in enumerate(lines)
     end
 end
 
-cover_left  = copy(trees)
-cover_right = copy(trees)
-cover_up    = copy(trees)
-cover_down  = copy(trees)
+visible = fill(0, height+2, width+2)
+
 for i in 2:height+1
+    current_max = -1
     for j in 2:height+1
-        cover_left[i,j]  = maximum(trees[i,1:j-1])
-        cover_right[i,j] = maximum(trees[i,j+1:end])
-        cover_up[i,j]    = maximum(trees[1:i-1,j])
-        cover_down[i,j]  = maximum(trees[i+1:end,j])
+        if trees[i,j] > current_max
+            visible[i,j] = 1
+            current_max = trees[i,j]
+        end
+    end
+    current_max = -1
+    for j in height+1:-1:2
+        if trees[i,j] > current_max
+            visible[i,j] = 1
+            current_max = trees[i,j]
+        end
+    end
+    current_max = -1
+    for j in 2:height+1
+        if trees[j,i] > current_max
+            visible[j,i] = 1
+            current_max = trees[j,i]
+        end
+    end
+    current_max = -1
+    for j in height+1:-1:2
+        if trees[j,i] > current_max
+            visible[j,i] = 1
+            current_max = trees[j,i]
+        end
     end
 end
-visible = trees .> cover_left
-visible = visible .|| (trees .> cover_right)
-visible = visible .|| (trees .> cover_up)
-visible = visible .|| (trees .> cover_down)
 
 visible_count = sum(visible)
 println("There are ", visible_count, " visible trees.")
-
