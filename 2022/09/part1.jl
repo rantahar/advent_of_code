@@ -51,4 +51,4 @@ for line in lines
     end
 end
 
-println(length(touched))
+println("Squares touched: ", length(touched))

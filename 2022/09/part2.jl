@@ -1,8 +1,9 @@
 
 lines = readlines("input")
+rope_length = 10
 
 knots = []
-for k in 1:10
+for k in 1:rope_length
     push!(knots, [1,1])
 end
 touched = Set([tuple(1,1)])
@@ -56,4 +57,4 @@ for line in lines
     end
 end
 
-println(length(touched))
+println("Squares touched: ", length(touched))
