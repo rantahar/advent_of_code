@@ -62,6 +62,7 @@ function printgrid(grid)
 end
 
 function simulate(grid)
+    grid = copy(grid)
     notdone = true
     count = 0
     path = []
